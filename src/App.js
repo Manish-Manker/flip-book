@@ -1,7 +1,7 @@
 
 import FlipBook from './FlipBook.js'
 // import BackupFlipBook from './BackupFlipBook'
-import './App.css'
+// import './App.css'
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';

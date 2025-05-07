@@ -27,11 +27,11 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
   }, [])
 
   const calculateFitDimensions = (originalWidth, originalHeight) => {
-    const maxWidth = window.innerWidth * 0.90; // Use 85% of viewport width
-    const maxHeight = window.innerHeight * 0.90; // Use 80% of viewport height
-
+    const maxWidth = window.innerWidth * 0.95; 
+    const maxHeight = window.innerHeight * 0.90;
+    
     const aspectRatio = originalWidth / originalHeight;
-
+    
     let finalWidth = originalWidth;
     let finalHeight = originalHeight;
 
@@ -40,19 +40,19 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
       finalWidth = maxWidth;
       finalHeight = finalWidth / aspectRatio;
     }
-
+    
     // Then check height
     if (finalHeight > maxHeight) {
       finalHeight = maxHeight;
       finalWidth = finalHeight * aspectRatio;
     }
-
+    
     // Ensure each page is not wider than half the screen
     if (finalWidth > maxWidth / 2) {
       finalWidth = maxWidth / 2;
       finalHeight = finalWidth / aspectRatio;
     }
-
+    
     return {
       width: Math.floor(finalWidth),
       height: Math.floor(finalHeight)
@@ -171,14 +171,16 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
                   onLoadSuccess={onDocumentLoadSuccess}
                 >
                   <Page
-                    pageNumber={index + 1}
-                    renderTextLayer={true}
-                    renderAnnotationLayer={true}
-                    width={pageWidth}
-                    height={pageHeight}
-                    devicePixelRatio={Math.min(2, window.devicePixelRatio)}
-                    wrap={true}
-                  // scale={1}
+                     pageNumber={index + 1}
+                     renderTextLayer={true}
+                     renderAnnotationLayer={true}
+                     width={pageWidth}
+                     height={pageHeight}
+                     devicePixelRatio={1} 
+                     scale={1}         
+                     loading="Loading page..."
+                     quality={70}     
+                     renderMode="canvas" 
                   />
                 </Document>
               </div>
