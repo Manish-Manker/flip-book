@@ -1,26 +1,26 @@
 .flipbook-container {
-    
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 10px;
+  min-width: 100vh;
+  padding: 5px;
   box-sizing: border-box;
   overflow: hidden;
-    background-color: #ccc;
-  }
+  /* background-color: #a17878; */
+}
 
-  
-  .upload-section {
-    text-align: center;
-    padding: 2rem;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-  }
-  
-  .demoPage {
-    /* background-color: white;
+
+.upload-section {
+  text-align: center;
+  padding: 2rem;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+}
+
+.demoPage {
+  /* background-color: white;
     border: 1px solid #ddd;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
     overflow: hidden;
@@ -28,37 +28,37 @@
      justify-content: center;
     align-items: center;
     position: relative; */
-    /* border: 5px solid #6d4d4d; */
-    padding: 10px;
-  }
-  
-  .react-pdf__Page__canvas {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 4px;
-    display: block;
-    margin: auto;
-  }
-  
-  .react-pdf__Page {
-    position: relative !important;
-    overflow: hidden !important;
-    margin: auto;
-  }
+  border: 0.5px solid #000000;
+  /* padding: 0 px; */
+}
 
-  .demo-book {
-    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.react-pdf__Page__canvas {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 4px;
+  display: block;
+  margin: auto;
+}
+
+.react-pdf__Page {
+  position: relative !important;
+  overflow: hidden !important;
+  margin: auto;
+}
+
+.demo-book {
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     border: 2px solid #ccc;
     border-radius: 8px;
     background: #fff; */
-    margin: 0 auto;
-    max-width: 100%;
-    max-height: 100%;
+  margin: 0 auto;
+  max-width: 100%;
+  max-height: 100%;
   /* max-width: 50%;
   max-height: 50%; */
-  }
-  
-  /* .flipbook-container{
+}
+
+/* .flipbook-container{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -67,11 +67,11 @@
     overflow: hidden;
   } */
 
-  .controls {
-    margin-bottom: 20px;
-    z-index: 100;
-  }
+.controls {
+  margin-bottom: 20px;
+  z-index: 100;
+}
 
-  button{
-    margin-right: 10px;
-  }
+button {
+  margin-right: 10px;
+}

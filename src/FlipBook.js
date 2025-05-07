@@ -6,7 +6,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-const FlipBook = ({ numPages01, pdfFile01, width, height ,pageFlipTimer}) => {
+const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
   const [pdfFile, setPdfFile] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [pageWidth, setPageWidth] = useState(0);
@@ -27,8 +27,8 @@ const FlipBook = ({ numPages01, pdfFile01, width, height ,pageFlipTimer}) => {
   }, [])
 
   const calculateFitDimensions = (originalWidth, originalHeight) => {
-    const maxWidth = window.innerWidth * 0.85; // Use 85% of viewport width
-    const maxHeight = window.innerHeight * 0.8; // Use 80% of viewport height
+    const maxWidth = window.innerWidth * 0.90; // Use 85% of viewport width
+    const maxHeight = window.innerHeight * 0.90; // Use 80% of viewport height
 
     const aspectRatio = originalWidth / originalHeight;
 
@@ -143,7 +143,7 @@ const FlipBook = ({ numPages01, pdfFile01, width, height ,pageFlipTimer}) => {
           <HTMLFlipBook
             onFlip={() => {
               let audio = new Audio('sound/page-flip01.mp3');
-               if (flipSound) audio.play();
+              if (flipSound) audio.play();
             }}
             ref={flipBookRef}
             width={pageWidth}
@@ -163,7 +163,6 @@ const FlipBook = ({ numPages01, pdfFile01, width, height ,pageFlipTimer}) => {
             autoSize={true}
             className="demo-book"
             style={{ margin: '0 auto' }}
-
           >
             {Array.from(new Array(numPages), (_, index) => (
               <div className="demoPage" key={index}>
@@ -177,6 +176,8 @@ const FlipBook = ({ numPages01, pdfFile01, width, height ,pageFlipTimer}) => {
                     renderAnnotationLayer={true}
                     width={pageWidth}
                     height={pageHeight}
+                    devicePixelRatio={Math.min(2, window.devicePixelRatio)}
+                    wrap={true}
                   // scale={1}
                   />
                 </Document>
