@@ -25,34 +25,60 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
   }, [])
 
   const calculateFitDimensions = (originalWidth, originalHeight) => {
-    const maxWidth = window.innerWidth;
-    const maxHeight = window.innerHeight;
-
+    const maxWidth = window.innerWidth * 0.85; // Use 85% of viewport width
+    const maxHeight = window.innerHeight * 0.8; // Use 80% of viewport height
+    
     const aspectRatio = originalWidth / originalHeight;
-
+    
     let finalWidth = originalWidth;
     let finalHeight = originalHeight;
-
+    
+    // First check width
     if (finalWidth > maxWidth) {
-      finalWidth = maxWidth / 2;
-      finalHeight = (finalWidth / aspectRatio);
+      finalWidth = maxWidth;
+      finalHeight = finalWidth / aspectRatio;
     }
-
+    
+    // Then check height
     if (finalHeight > maxHeight) {
       finalHeight = maxHeight;
-      finalWidth = (finalHeight / aspectRatio);
+      finalWidth = finalHeight * aspectRatio;
     }
-
-    return { width: finalWidth, height: finalHeight };
+    
+    // Ensure each page is not wider than half the screen
+    if (finalWidth > maxWidth / 2) {
+      finalWidth = maxWidth / 2;
+      finalHeight = finalWidth / aspectRatio;
+    }
+    
+    return { 
+      width: Math.floor(finalWidth), 
+      height: Math.floor(finalHeight) 
+    };
   };
 
   useEffect(() => {
-    const { width: fitWidth, height: fitHeight } = calculateFitDimensions(width, height);
-    setPageWidth(fitWidth);
-    setPageHeight(fitHeight);
-    setPdfFile(pdfFile01);
-    setNumPages(numPages01);
-  }, [width, height, pdfFile01, numPages01]);
+    const handleResize = () => {
+      const { width: fitWidth, height: fitHeight } = calculateFitDimensions(width, height);
+      setPageWidth(fitWidth);
+      setPageHeight(fitHeight);
+    };
+  
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial calculation
+  
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [width, height]);
+
+  // useEffect(() => {
+  //   const { width: fitWidth, height: fitHeight } = calculateFitDimensions(width, height);
+  //   setPageWidth(fitWidth);
+  //   setPageHeight(fitHeight);
+  //   setPdfFile(pdfFile01);
+  //   setNumPages(numPages01);
+  // }, [width, height, pdfFile01, numPages01]);
 
   const startAutoplay = () => {
     if (flipBookRef.current) {
