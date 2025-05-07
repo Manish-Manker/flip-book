@@ -6,7 +6,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
+const FlipBook = ({ numPages01, pdfFile01, width, height ,pageFlipTimer}) => {
   const [pdfFile, setPdfFile] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [pageWidth, setPageWidth] = useState(0);
@@ -16,6 +16,8 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
   const autoplayInterval = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [flipSound, setFlipSound] = useState(false);
+  const [isControlVisible, setIsControlVisible] = useState(true);
 
   useEffect(() => {
     setPageHeight(height);
@@ -27,33 +29,33 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
   const calculateFitDimensions = (originalWidth, originalHeight) => {
     const maxWidth = window.innerWidth * 0.85; // Use 85% of viewport width
     const maxHeight = window.innerHeight * 0.8; // Use 80% of viewport height
-    
+
     const aspectRatio = originalWidth / originalHeight;
-    
+
     let finalWidth = originalWidth;
     let finalHeight = originalHeight;
-    
+
     // First check width
     if (finalWidth > maxWidth) {
       finalWidth = maxWidth;
       finalHeight = finalWidth / aspectRatio;
     }
-    
+
     // Then check height
     if (finalHeight > maxHeight) {
       finalHeight = maxHeight;
       finalWidth = finalHeight * aspectRatio;
     }
-    
+
     // Ensure each page is not wider than half the screen
     if (finalWidth > maxWidth / 2) {
       finalWidth = maxWidth / 2;
       finalHeight = finalWidth / aspectRatio;
     }
-    
-    return { 
-      width: Math.floor(finalWidth), 
-      height: Math.floor(finalHeight) 
+
+    return {
+      width: Math.floor(finalWidth),
+      height: Math.floor(finalHeight)
     };
   };
 
@@ -63,10 +65,10 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
       setPageWidth(fitWidth);
       setPageHeight(fitHeight);
     };
-  
+
     window.addEventListener('resize', handleResize);
     handleResize(); // Initial calculation
-  
+
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -79,6 +81,7 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
   //   setPdfFile(pdfFile01);
   //   setNumPages(numPages01);
   // }, [width, height, pdfFile01, numPages01]);
+  let audio = new Audio('sound/page-flip1.mp3');
 
   const startAutoplay = () => {
     if (flipBookRef.current) {
@@ -86,13 +89,14 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
       autoplayInterval.current = setInterval(() => {
         const currentPage = flipBookRef.current.pageFlip().getCurrentPageIndex();
         if (currentPage < numPages - 1) {
+          audio.play();
           flipBookRef.current.pageFlip().flipNext();
         }
         else {
           setIsPlaying(false);
           clearInterval(autoplayInterval.current);
         }
-      }, 1500);
+      }, pageFlipTimer * 1000);
     }
   };
 
@@ -120,15 +124,27 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
         <>
 
           <div className="controls">
-            <button onClick={isPlaying ? stopAutoplay : startAutoplay}>
+            <button onClick={() => setIsControlVisible(!isControlVisible)}>
+              {isControlVisible ? 'Disable Controls' : 'Enable Controls'}
+            </button>
+
+            <button disabled={!isControlVisible} onClick={isPlaying ? stopAutoplay : startAutoplay}>
               {isPlaying ? 'Stop Autoplay' : 'Start Autoplay'}
             </button>
-            <button onClick={() => window.open(pdfFile, '_blank')}>
+
+            <button disabled={!isControlVisible} onClick={() => window.open(pdfFile, '_blank')}>
               Download Flipbook
+            </button>
+            <button disabled={!isControlVisible} onClick={() => setFlipSound(!flipSound)}>
+              Flip sound {flipSound ? 'ON' : 'OFF'}
             </button>
           </div>
 
           <HTMLFlipBook
+            onFlip={() => {
+              let audio = new Audio('sound/page-flip01.mp3');
+               if (flipSound) audio.play();
+            }}
             ref={flipBookRef}
             width={pageWidth}
             height={pageHeight}
@@ -139,14 +155,15 @@ const FlipBook = ({ numPages01, pdfFile01, width, height }) => {
             maxHeight={pageHeight}
             maxShadowOpacity={0.8}
             drawShadow={true}
-            flippingTime={700}
+            // flippingTime={1000}
             usePortrait={false}
             startPage={currentPage}
             showCover={true}
             mobileScrollSupport={true}
             autoSize={true}
             className="demo-book"
-          style={{ margin: '0 auto' }}
+            style={{ margin: '0 auto' }}
+
           >
             {Array.from(new Array(numPages), (_, index) => (
               <div className="demoPage" key={index}>

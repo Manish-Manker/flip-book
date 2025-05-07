@@ -15,6 +15,7 @@ const App = () => {
 
   const [pdfFile, setPdfFile] = useState(null);
   const [numPages, setNumPages] = useState(null);
+  const [pageFlipTimer, setPageFlipTimer] = useState(2);
 
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
@@ -59,17 +60,20 @@ const App = () => {
   return (
     <>
       {!pdfFile ? (
-        <div className="upload-section">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handleFileUpload}
-          />
-          <p>Upload a PDF file to create a flip book</p>
-        </div>
+        <>
+          <div className="upload-section">
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handleFileUpload}
+            />
+            <p>Upload a PDF file to create a flip book</p>
+            <input min={1} max={10} value={pageFlipTimer} onChange={(e) => setPageFlipTimer(e.target.value)} type="number"></input>
+          </div>
+        </>
       ) : (
         <div className="flipbook-container" >
-          <FlipBook numPages01={numPages} pdfFile01={pdfFile} width={width} height={height} />
+          <FlipBook numPages01={numPages} pdfFile01={pdfFile} width={width} height={height} pageFlipTimer={pageFlipTimer} />
         </div>
       )}
     </>
