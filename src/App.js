@@ -1,11 +1,9 @@
 
 import FlipBook from './FlipBook.js'
-// import BackupFlipBook from './BackupFlipBook'
-// import './App.css'
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
-import HTMLFlipBook from 'react-pageflip';
+import React, { useState} from 'react';
+import {  pdfjs } from 'react-pdf';
+
 import './flip.css'
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
