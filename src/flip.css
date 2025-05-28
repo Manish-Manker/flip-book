@@ -8,9 +8,7 @@
   padding: 5px;
   box-sizing: border-box;
   overflow: hidden;
-  /* background-color: #a17878; */
 }
-
 
 .upload-section {
   text-align: center;
@@ -19,17 +17,92 @@
   border-radius: 8px;
 }
 
+.controls {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 100;
+}
+
+.effect-select {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button {
+  margin-right: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .demoPage {
-  /* background-color: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
-    overflow: hidden;
-     display: flex;
-     justify-content: center;
-    align-items: center;
-    position: relative; */
   border: 0.5px solid #000000;
-  /* padding: 0 px; */
+}
+
+/* Magazine Effect */
+.magazine .demoPage {
+  box-shadow: inset -7px 0 30px -7px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to right, #f8f8f8, #fff);
+}
+
+.magazine .demoPage:nth-child(even) {
+  box-shadow: inset 7px 0 30px -7px rgba(0, 0, 0, 0.4);
+}
+
+/* Book Effect */
+.book .demoPage {
+  box-shadow: inset -4px 0 15px -4px rgba(0, 0, 0, 0.7);
+  background: #fff;
+}
+
+.book .demoPage:nth-child(even) {
+  box-shadow: inset 4px 0 15px -4px rgba(0, 0, 0, 0.7);
+}
+
+/* Album Effect */
+.album .demoPage {
+  box-shadow: inset -5px 0 25px -5px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(45deg, #f3f3f3 25%, #ffffff 25%);
+}
+
+.album .demoPage:nth-child(even) {
+  box-shadow: inset 5px 0 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Notebook Effect */
+.notebook .demoPage {
+  box-shadow: inset -2px 0 10px -2px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(90deg, #ffffff 0%, #f9f9f9 100%);
+}
+
+.notebook .demoPage:nth-child(even) {
+  box-shadow: inset 2px 0 10px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Common page turn effect */
+.demoPage::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+  border-radius: 0 0 0 5px;
+  pointer-events: none;
 }
 
 .react-pdf__Page__canvas {
@@ -47,31 +120,7 @@
 }
 
 .demo-book {
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    background: #fff; */
   margin: 0 auto;
   max-width: 100%;
   max-height: 100%;
-  /* max-width: 50%;
-  max-height: 50%; */
-}
-
-/* .flipbook-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f5f5f5;
-    padding: 20px;
-    overflow: hidden;
-  } */
-
-.controls {
-  margin-bottom: 20px;
-  z-index: 100;
-}
-
-button {
-  margin-right: 10px;
 }
