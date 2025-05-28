@@ -9,13 +9,15 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-flip';
-import { Navigation, Pagination, EffectFlip } from 'swiper/modules';
+// import { Navigation, Pagination, EffectFlip } from 'swiper/modules';
 import 'swiper/css/effect-coverflow';
-import { EffectCoverflow } from 'swiper/modules';
+// import { EffectCoverflow } from 'swiper/modules';
 import 'swiper/css/effect-cards';
-import { EffectCards } from 'swiper/modules';
+// import { EffectCards } from 'swiper/modules';
+// import { Autoplay } from 'swiper/modules';
+import 'swiper/css/autoplay';
 
-
+import { Navigation, Pagination, EffectFlip, EffectCoverflow, EffectCards, Autoplay } from 'swiper/modules';
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -29,6 +31,7 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [theme, setTheme] = useState('book');
 
+  const swiperRef = useRef(null);
   const flipBookRef = useRef(null);
   const autoplayInterval = useRef(null);
   const audioRef = useRef(new Audio(process.env.PUBLIC_URL + '/sound/page-flip1.mp3'));
@@ -71,16 +74,14 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
     return () => clearInterval(autoplayInterval.current); // cleanup
   }, []);
 
-  // useEffect(() => {
-  //   if (flipBookRef.current && flipBookRef.current.pageFlip) {
-  //     flipBookRef.current.pageFlip().turnToPage(0);
-  //     setCurrentPage(0);
-  //   }
-  // }, [theme]);
 
   const startAutoplay = () => {
-    if (flipBookRef.current) {
-      setIsPlaying(true);
+    setIsPlaying(true);
+    if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
+      if (swiperRef.current && swiperRef.current.autoplay) {
+        swiperRef.current.autoplay.start();
+      }
+    } else if (theme === 'book' || theme === 'magazine' || theme === 'album' || theme === 'notebook') {
       autoplayInterval.current = setInterval(() => {
         const current = flipBookRef.current.pageFlip().getCurrentPageIndex();
         if (current < numPages01 - 1) {
@@ -95,7 +96,28 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
 
   const stopAutoplay = () => {
     setIsPlaying(false);
-    clearInterval(autoplayInterval.current);
+    if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
+      if (swiperRef.current && swiperRef.current.autoplay) {
+        swiperRef.current.autoplay.stop();
+      }
+    } else if (theme === 'book' || theme === 'magazine' || theme === 'album' || theme === 'notebook') {
+      clearInterval(autoplayInterval.current);
+    }
+  };
+
+  const swiperConfig = {
+    loop: true,
+    speed: 800,
+    autoplay: {
+      delay: pageFlipTimer * 1000,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+      enabled: isPlaying,
+      waitForTransition: true
+    },
+    onSwiper: (swiper) => {
+      swiperRef.current = swiper;
+    }
   };
 
   return (
@@ -154,13 +176,13 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
 
           {theme === 'slider' ? (
             <Swiper
+              {...swiperConfig}
               key={theme}
-              modules={[Navigation, Pagination]}
+              modules={[Navigation, Pagination, Autoplay]}
               slidesPerView="auto"
               centeredSlides={true}
               spaceBetween={30}
-              navigation
-              // pagination={{ clickable: true }}
+              navigation={true}
               style={{ width: pageWidth * 2, height: pageHeight }}
               onSlideChange={(swiper) => setCurrentPage(swiper.activeIndex)}
               className="faded-slider"
@@ -191,8 +213,10 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
 
             theme === 'coverflow' ? (
               <Swiper
+                {...swiperConfig}
                 key={theme}
                 effect="coverflow"
+                modules={[EffectCoverflow, Navigation, Pagination, Autoplay]}
                 grabCursor={true}
                 centeredSlides={true}
                 slidesPerView="auto"
@@ -203,11 +227,8 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
                   modifier: 1,
                   slideShadows: false,
                 }}
-                pagination={false}
                 navigation={true}
-                modules={[EffectCoverflow, Pagination, Navigation]}
                 style={{ width: pageWidth * 2, height: pageHeight }}
-                // className="coverflow-swiper"
                 className="coverflow-swiper faded-slider"
               >
                 {Array.from(new Array(numPages01), (_, index) => (
@@ -234,10 +255,11 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
 
               theme === 'cards' ? (
                 <Swiper
+                  {...swiperConfig}
                   key={theme}
                   effect="cards"
+                  modules={[EffectCards, Navigation, Autoplay]}
                   grabCursor={true}
-                  modules={[EffectCards,Navigation]}
                   navigation={true}
                   style={{ width: pageWidth, height: pageHeight }}
                   className="cards-swiper"
@@ -261,11 +283,12 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
 
                 theme === 'flip-slide' ? (
                   <Swiper
+                    {...swiperConfig}
                     key={theme}
-                    effect={'flip'}
+                    effect="flip"
+                    modules={[EffectFlip, Navigation, Autoplay]}
                     grabCursor={true}
-                    navigation
-                    modules={[EffectFlip, Navigation]}
+                    navigation={true}
                     style={{ width: pageWidth, height: pageHeight }}
                     className="flip-style-swiper"
                   >
