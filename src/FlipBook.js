@@ -4,6 +4,20 @@ import HTMLFlipBook from 'react-pageflip';
 import './flip.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-flip';
+import { Navigation, Pagination, EffectFlip } from 'swiper/modules';
+import 'swiper/css/effect-coverflow';
+import { EffectCoverflow } from 'swiper/modules';
+import 'swiper/css/effect-cards';
+import { EffectCards } from 'swiper/modules';
+
+
+
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
@@ -130,60 +144,199 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
                 <option value="magazine">Magazine</option>
                 <option value="album">Album</option>
                 <option value="notebook">Notebook</option>
+                <option value="slider">Slider</option>
+                <option value="coverflow">Coverflow</option>
+                <option value="cards">Cards</option>
+                <option value="flip-slide">One Page</option>
               </select>
             </label>
           </div>
 
-          <HTMLFlipBook
-            key={theme}
-            onFlip={() => {
-              if (flipSound) audioRef.current.play();
-            }}
-            ref={flipBookRef}
-            width={pageWidth}
-            height={pageHeight}
-            size="fixed"
-            minWidth={pageWidth}
-            maxWidth={pageWidth}
-            minHeight={pageHeight}
-            maxHeight={pageHeight}
-            drawShadow={true}
-            maxShadowOpacity={0.5}
-            usePortrait={false}
-            startPage={currentPage}
-             showCover={theme !== 'magazine'}
-            mobileScrollSupport={true}
-            autoSize={true}
-            className={`demo-book ${theme}`}
-            style={{ margin: '0 auto' }}
-          >
-            {Array.from(new Array(numPages01), (_, index) => (
-              <div
-                className="demoPage"
-                key={index}
-                data-density={
-                  theme === 'album' ? 'hard' :
-                    theme === 'magazine' ? 'soft' :
-                      undefined
-                }
+          {theme === 'slider' ? (
+            <Swiper
+              key={theme}
+              modules={[Navigation, Pagination]}
+              slidesPerView="auto"
+              centeredSlides={true}
+              spaceBetween={30}
+              navigation
+              // pagination={{ clickable: true }}
+              style={{ width: pageWidth * 2, height: pageHeight }}
+              onSlideChange={(swiper) => setCurrentPage(swiper.activeIndex)}
+              className="faded-slider"
+            >
+              {Array.from(new Array(numPages01), (_, index) => (
+                <SwiperSlide
+                  key={index}
+                  style={{
+                    width: `${pageWidth}px`,
+                    height: `${pageHeight}px`,
+                  }}
+                >
+                  <Document file={pdfFile01}>
+                    <Page
+                      pageNumber={index + 1}
+                      width={pageWidth}
+                      height={pageHeight}
+                      renderTextLayer={true}
+                      renderAnnotationLayer={true}
+                    />
+                  </Document>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+
+          ) :
+
+            theme === 'coverflow' ? (
+              <Swiper
+                key={theme}
+                effect="coverflow"
+                grabCursor={true}
+                centeredSlides={true}
+                slidesPerView="auto"
+                coverflowEffect={{
+                  rotate: 50,
+                  stretch: 0,
+                  depth: 100,
+                  modifier: 1,
+                  slideShadows: false,
+                }}
+                pagination={false}
+                navigation={true}
+                modules={[EffectCoverflow, Pagination, Navigation]}
+                style={{ width: pageWidth * 2, height: pageHeight }}
+                // className="coverflow-swiper"
+                className="coverflow-swiper faded-slider"
               >
-                <Document file={pdfFile01}>
-                  <Page
-                    pageNumber={index + 1}
-                    renderTextLayer={true}
-                    renderAnnotationLayer={true}
-                    width={pageWidth}
-                    height={pageHeight}
-                    devicePixelRatio={1}
-                    scale={1}
-                    loading="Loading page..."
-                    quality={70}
-                    renderMode="canvas"
-                  />
-                </Document>
-              </div>
-            ))}
-          </HTMLFlipBook>
+                {Array.from(new Array(numPages01), (_, index) => (
+                  <SwiperSlide
+                    key={index}
+                    style={{
+                      width: `${pageWidth}px`,
+                      height: `${pageHeight}px`,
+                    }}
+                  >
+                    <Document file={pdfFile01}>
+                      <Page
+                        pageNumber={index + 1}
+                        width={pageWidth}
+                        height={pageHeight}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={true}
+                      />
+                    </Document>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) :
+
+              theme === 'cards' ? (
+                <Swiper
+                  key={theme}
+                  effect="cards"
+                  grabCursor={true}
+                  modules={[EffectCards,Navigation]}
+                  navigation={true}
+                  style={{ width: pageWidth, height: pageHeight }}
+                  className="cards-swiper"
+                >
+                  {Array.from(new Array(numPages01), (_, index) => (
+                    <SwiperSlide key={index}>
+                      <Document file={pdfFile01}>
+                        <Page
+                          pageNumber={index + 1}
+                          width={pageWidth}
+                          height={pageHeight}
+                          renderTextLayer={false}
+                          renderAnnotationLayer={true}
+                        />
+                      </Document>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              ) :
+
+
+                theme === 'flip-slide' ? (
+                  <Swiper
+                    key={theme}
+                    effect={'flip'}
+                    grabCursor={true}
+                    navigation
+                    modules={[EffectFlip, Navigation]}
+                    style={{ width: pageWidth, height: pageHeight }}
+                    className="flip-style-swiper"
+                  >
+                    {Array.from(new Array(numPages01), (_, index) => (
+                      <SwiperSlide key={index}>
+                        <Document file={pdfFile01}>
+                          <Page
+                            pageNumber={index + 1}
+                            width={pageWidth}
+                            height={pageHeight}
+                            renderTextLayer={false}
+                            renderAnnotationLayer={true}
+                          />
+                        </Document>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                )
+                  : (
+
+                    <HTMLFlipBook
+                      key={theme}
+                      onFlip={() => {
+                        if (flipSound) audioRef.current.play();
+                      }}
+                      ref={flipBookRef}
+                      width={pageWidth}
+                      height={pageHeight}
+                      size="fixed"
+                      minWidth={pageWidth}
+                      maxWidth={pageWidth}
+                      minHeight={pageHeight}
+                      maxHeight={pageHeight}
+                      drawShadow={true}
+                      maxShadowOpacity={0.5}
+                      usePortrait={false}
+                      startPage={currentPage}
+                      showCover={theme !== 'magazine'}
+                      mobileScrollSupport={true}
+                      autoSize={true}
+                      className={`demo-book ${theme}`}
+                      style={{ margin: '0 auto' }}
+                    >
+                      {Array.from(new Array(numPages01), (_, index) => (
+                        <div
+                          className="demoPage"
+                          key={index}
+                          data-density={
+                            theme === 'album' ? 'hard' :
+                              theme === 'magazine' ? 'soft' :
+                                undefined
+                          }
+                        >
+                          <Document file={pdfFile01}>
+                            <Page
+                              pageNumber={index + 1}
+                              renderTextLayer={true}
+                              renderAnnotationLayer={true}
+                              width={pageWidth}
+                              height={pageHeight}
+                              devicePixelRatio={1}
+                              scale={1}
+                              loading="Loading page..."
+                              quality={70}
+                              renderMode="canvas"
+                            />
+                          </Document>
+                        </div>
+                      ))}
+                    </HTMLFlipBook>
+                  )}
         </>
       )}
     </div>
