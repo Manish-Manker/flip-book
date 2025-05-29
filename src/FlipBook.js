@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, use } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import HTMLFlipBook from 'react-pageflip';
 import './flip.css';
@@ -9,12 +9,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-flip';
-// import { Navigation, Pagination, EffectFlip } from 'swiper/modules';
+
 import 'swiper/css/effect-coverflow';
-// import { EffectCoverflow } from 'swiper/modules';
+
 import 'swiper/css/effect-cards';
-// import { EffectCards } from 'swiper/modules';
-// import { Autoplay } from 'swiper/modules';
 import 'swiper/css/autoplay';
 
 import { Navigation, Pagination, EffectFlip, EffectCoverflow, EffectCards, Autoplay } from 'swiper/modules';
@@ -75,35 +73,49 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
   }, []);
 
 
-  const startAutoplay = () => {
-    setIsPlaying(true);
-    if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
-      if (swiperRef.current && swiperRef.current.autoplay) {
-        swiperRef.current.autoplay.start();
-      }
-    } else if (theme === 'book' || theme === 'magazine' || theme === 'album' || theme === 'notebook') {
-      autoplayInterval.current = setInterval(() => {
-        const current = flipBookRef.current.pageFlip().getCurrentPageIndex();
-        if (current < numPages01 - 1) {
-          if (flipSound) audioRef.current.play();
-          flipBookRef.current.pageFlip().flipNext();
-        } else {
-          stopAutoplay();
-        }
-      }, pageFlipTimer * 1000);
-    }
-  };
+ const startAutoplay = () => {
+  setIsPlaying(true);
 
-  const stopAutoplay = () => {
-    setIsPlaying(false);
-    if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
-      if (swiperRef.current && swiperRef.current.autoplay) {
-        swiperRef.current.autoplay.stop();
-      }
-    } else if (theme === 'book' || theme === 'magazine' || theme === 'album' || theme === 'notebook') {
-      clearInterval(autoplayInterval.current);
+  if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
+    if (swiperRef.current) {
+      swiperRef.current.slideTo(0); // Go to first slide
+      swiperRef.current.autoplay.start();
     }
+  } else if (theme === 'book' || theme === 'magazine' || theme === 'album' || theme === 'notebook') {
+    if (flipBookRef.current) {
+      flipBookRef.current.pageFlip().flip(0); // Go to first page
+    }
+
+    autoplayInterval.current = setInterval(() => {
+      const current = flipBookRef.current.pageFlip().getCurrentPageIndex();
+      if (current < numPages01 - 1) {
+        if (flipSound) audioRef.current.play();
+        flipBookRef.current.pageFlip().flipNext();
+      } else {
+        // 🔁 Restart from first page when end is reached
+        flipBookRef.current.pageFlip().flip(0);
+      }
+    }, pageFlipTimer * 1000);
+  }
+};
+
+
+const stopAutoplay = () => {
+  setIsPlaying(false);
+  if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
+    if (swiperRef.current && swiperRef.current.autoplay) {
+      swiperRef.current.autoplay.stop();
+    }
+  } else {
+    clearInterval(autoplayInterval.current);
+  }
+};
+
+useEffect(() => {
+  return () => {
+    stopAutoplay();
   };
+}, [theme]);
 
   const swiperConfig = {
     loop: true,
@@ -178,6 +190,7 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
             <Swiper
               {...swiperConfig}
               key={theme}
+              loop={false}
               modules={[Navigation, Pagination, Autoplay]}
               slidesPerView="auto"
               centeredSlides={true}
@@ -215,6 +228,7 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
               <Swiper
                 {...swiperConfig}
                 key={theme}
+                loop={false}
                 effect="coverflow"
                 modules={[EffectCoverflow, Navigation, Pagination, Autoplay]}
                 grabCursor={true}
@@ -257,6 +271,7 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
                 <Swiper
                   {...swiperConfig}
                   key={theme}
+                  loop={false}
                   effect="cards"
                   modules={[EffectCards, Navigation, Autoplay]}
                   grabCursor={true}
@@ -280,11 +295,11 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
                 </Swiper>
               ) :
 
-
                 theme === 'flip-slide' ? (
                   <Swiper
                     {...swiperConfig}
                     key={theme}
+                    loop={false}
                     effect="flip"
                     modules={[EffectFlip, Navigation, Autoplay]}
                     grabCursor={true}
