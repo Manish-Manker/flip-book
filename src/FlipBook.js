@@ -73,49 +73,49 @@ const FlipBook = ({ numPages01, pdfFile01, width, height, pageFlipTimer }) => {
   }, []);
 
 
- const startAutoplay = () => {
-  setIsPlaying(true);
+  const startAutoplay = () => {
+    setIsPlaying(true);
 
-  if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
-    if (swiperRef.current) {
-      swiperRef.current.slideTo(0); // Go to first slide
-      swiperRef.current.autoplay.start();
-    }
-  } else if (theme === 'book' || theme === 'magazine' || theme === 'album' || theme === 'notebook') {
-    if (flipBookRef.current) {
-      flipBookRef.current.pageFlip().flip(0); // Go to first page
-    }
-
-    autoplayInterval.current = setInterval(() => {
-      const current = flipBookRef.current.pageFlip().getCurrentPageIndex();
-      if (current < numPages01 - 1) {
-        if (flipSound) audioRef.current.play();
-        flipBookRef.current.pageFlip().flipNext();
-      } else {
-        // 🔁 Restart from first page when end is reached
-        flipBookRef.current.pageFlip().flip(0);
+    if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
+      if (swiperRef.current) {
+        swiperRef.current.slideTo(0); // Go to first slide
+        swiperRef.current.autoplay.start();
       }
-    }, pageFlipTimer * 1000);
-  }
-};
+    } else if (theme === 'book' || theme === 'magazine' || theme === 'album' || theme === 'notebook') {
+      if (flipBookRef.current) {
+        flipBookRef.current.pageFlip().flip(0); // Go to first page
+      }
 
-
-const stopAutoplay = () => {
-  setIsPlaying(false);
-  if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
-    if (swiperRef.current && swiperRef.current.autoplay) {
-      swiperRef.current.autoplay.stop();
+      autoplayInterval.current = setInterval(() => {
+        const current = flipBookRef.current.pageFlip().getCurrentPageIndex();
+        if (current < numPages01 - 1) {
+          if (flipSound) audioRef.current.play();
+          flipBookRef.current.pageFlip().flipNext();
+        } else {
+          // 🔁 Restart from first page when end is reached
+          flipBookRef.current.pageFlip().flip(0);
+        }
+      }, pageFlipTimer * 1000);
     }
-  } else {
-    clearInterval(autoplayInterval.current);
-  }
-};
-
-useEffect(() => {
-  return () => {
-    stopAutoplay();
   };
-}, [theme]);
+
+
+  const stopAutoplay = () => {
+    setIsPlaying(false);
+    if (theme === 'slider' || theme === 'coverflow' || theme === 'cards' || theme === 'flip-slide') {
+      if (swiperRef.current && swiperRef.current.autoplay) {
+        swiperRef.current.autoplay.stop();
+      }
+    } else {
+      clearInterval(autoplayInterval.current);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      stopAutoplay();
+    };
+  }, [theme]);
 
   const swiperConfig = {
     loop: true,
@@ -197,7 +197,14 @@ useEffect(() => {
               spaceBetween={30}
               navigation={true}
               style={{ width: pageWidth * 2, height: pageHeight }}
-              onSlideChange={(swiper) => setCurrentPage(swiper.activeIndex)}
+              onSlideChange={(swiper) => {
+                setCurrentPage(swiper.activeIndex);
+                if (flipSound) {
+                  audioRef.current.pause();
+                  audioRef.current.currentTime = 0;
+                  audioRef.current.play();
+                }
+              }}
               className="faded-slider"
             >
               {Array.from(new Array(numPages01), (_, index) => (
@@ -243,6 +250,14 @@ useEffect(() => {
                 }}
                 navigation={true}
                 style={{ width: pageWidth * 2, height: pageHeight }}
+                onSlideChange={(swiper) => {
+                  setCurrentPage(swiper.activeIndex);
+                  if (flipSound) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                    audioRef.current.play();
+                  }
+                }}
                 className="coverflow-swiper faded-slider"
               >
                 {Array.from(new Array(numPages01), (_, index) => (
@@ -277,6 +292,14 @@ useEffect(() => {
                   grabCursor={true}
                   navigation={true}
                   style={{ width: pageWidth, height: pageHeight }}
+                  onSlideChange={(swiper) => {
+                    setCurrentPage(swiper.activeIndex);
+                    if (flipSound) {
+                      audioRef.current.pause();
+                      audioRef.current.currentTime = 0;
+                      audioRef.current.play();
+                    }
+                  }}
                   className="cards-swiper"
                 >
                   {Array.from(new Array(numPages01), (_, index) => (
@@ -305,6 +328,14 @@ useEffect(() => {
                     grabCursor={true}
                     navigation={true}
                     style={{ width: pageWidth, height: pageHeight }}
+                    onSlideChange={(swiper) => {
+                      setCurrentPage(swiper.activeIndex);
+                      if (flipSound) {
+                        audioRef.current.pause();
+                        audioRef.current.currentTime = 0;
+                        audioRef.current.play();
+                      }
+                    }}
                     className="flip-style-swiper"
                   >
                     {Array.from(new Array(numPages01), (_, index) => (
